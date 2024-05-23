@@ -1,5 +1,5 @@
 import { Test } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
+import { HttpStatus, INestApplication } from '@nestjs/common';
 import { AppModule } from '../src/app.module';
 import { AssignorService } from 'src/assignor/assignor.service';
 import { randomUUID } from 'crypto';
@@ -25,9 +25,24 @@ describe('Auth', () => {
     await app.init();
   });
 
-  it('/GET /integrations/assignor/id with no auth', () => {
+  it('GET /integrations/assignor/id with no auth', () => {
     return request(app.getHttpServer())
       .get(`/integrations/assignor/${entity.id}`)
       .expect(403);
+  });
+
+  it('Authorization flow', async () => {
+    const client = request(app.getHttpServer());
+    const { body, statusCode } = await client
+      .post('/integrations/auth')
+      .send({ login: 'aprovame', password: 'aprovame' })
+      .set('Content-Type', 'application/json');
+    expect(statusCode).toBe(HttpStatus.CREATED);
+    const { accessToken } = body;
+    const response = await client
+      .get(`/integrations/assignor/${entity.id}`)
+      .set('Authorization', `Bearer ${accessToken}`);
+    expect(response.statusCode).toBe(HttpStatus.OK);
+    expect(response.body).toEqual(entity);
   });
 });
