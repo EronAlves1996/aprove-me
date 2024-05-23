@@ -14,7 +14,7 @@ export class UsersService {
     },
   ];
 
-  async retrieve(_: string): Promise<User | undefined> {
-    return this.users[0];
+  async retrieve(username: string): Promise<User | undefined> {
+    return this.users.find((u) => u.login === username);
   }
 }
