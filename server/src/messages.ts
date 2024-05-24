@@ -5,3 +5,7 @@ export const ENTITY_ID_NOT_EQUALS = {
 export const NOT_FOUND = {
   message: 'Not Found',
 };
+export const USER_ALREADY_EXISTS = {
+  message: 'This user already exists',
+};
+
